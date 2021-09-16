@@ -1,0 +1,16 @@
+version: "2"
+services:
+  postgres_db:
+    image: postgres:12.7
+    container_name: postgres_db
+    hostname: postgres_db
+    env_file:
+      - ./.postgres.env
+    volumes:
+      - postgres_db_volume:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    restart: always
+  
+volumes:
+  postgres_db_volume:

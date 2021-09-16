@@ -1,0 +1,73 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Category {
+  id                 Int                @id @default(autoincrement())
+  createdAt          DateTime?          @default(now()) @map("created_at") @db.Timestamptz(0)
+  updatedAt          DateTime?          @default(now()) @map("updated_at") @db.Timestamptz(0)
+  title              String
+  parentId           Int?               @map("parent_id")
+  parentCategory     Category?          @relation(fields: [parentId], references: [id])
+  subCategories      Category[]         @relation("CategoryToCategory")
+  products           Product[]
+  discountCategories DiscountCategory[]
+
+  @@map("category")
+}
+
+model Product {
+  id               Int               @id @default(autoincrement())
+  createdAt        DateTime?         @default(now()) @map("created_at") @db.Timestamptz(0)
+  updatedAt        DateTime?         @default(now()) @map("updated_at") @db.Timestamptz(0)
+  name             String
+  price            Int
+  categoryId       Int               @map("category_id")
+  category         Category          @relation(fields: [categoryId], references: [id])
+  discountProducts DiscountProduct[]
+
+  @@map("product")
+}
+
+model Discount {
+  id                 Int                @id @default(autoincrement())
+  createdAt          DateTime?          @default(now()) @map("created_at") @db.Timestamptz(0)
+  updatedAt          DateTime?          @default(now()) @map("updated_at") @db.Timestamptz(0)
+  code               String
+  percentage         Int
+  discountProducts   DiscountProduct[]
+  discountCategories DiscountCategory[]
+
+  @@map("discount")
+}
+
+model DiscountProduct {
+  id         Int       @id @default(autoincrement())
+  createdAt  DateTime? @default(now()) @map("created_at") @db.Timestamptz(0)
+  updatedAt  DateTime? @default(now()) @map("updated_at") @db.Timestamptz(0)
+  discountId Int       @map("discount_id")
+  productId  Int       @map("product_id")
+  discount   Discount  @relation(fields: [discountId], references: [id])
+  product    Product   @relation(fields: [productId], references: [id])
+
+  @@unique([discountId, productId])
+  @@map("discount_product")
+}
+
+model DiscountCategory {
+  id         Int       @id @default(autoincrement())
+  createdAt  DateTime? @default(now()) @map("created_at") @db.Timestamptz(0)
+  updatedAt  DateTime? @default(now()) @map("updated_at") @db.Timestamptz(0)
+  discountId Int       @map("discount_id")
+  categoryId Int       @map("category_id")
+  discount   Discount  @relation(fields: [discountId], references: [id])
+  category   Category  @relation(fields: [categoryId], references: [id])
+
+  @@unique([discountId, categoryId])
+  @@map("discount_category")
+}

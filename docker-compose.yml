@@ -1,0 +1,15 @@
+version: '3.3'
+services:
+  discount_module_backend:
+    build:
+      context: .
+      dockerfile: 'dockerfile'
+    image: discount_module_backend
+    container_name: discount_module_backend
+    hostname: discount_module_backend
+    command: sh run.sh
+    env_file:
+      - .env
+    restart: always
+    ports:
+      - ${HTTP_SERVER_PORT}:${HTTP_SERVER_PORT}
